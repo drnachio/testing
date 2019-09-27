@@ -4,9 +4,9 @@ module.exports = {
   setupFiles: ['<rootDir>/jest.setup.js'],
   testRegex: testRegex,
   transform: {
-    '^.+\\.tsx?$': 'babel-jest'
+    '^.+\\.jsx?$': require.resolve('babel-jest'),
+    '^.+\\.tsx?$': 'ts-jest'
   },
   testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  collectCoverage: false
-}
+};
