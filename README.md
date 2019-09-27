@@ -1,2 +1,3 @@
-# ts-next-boilerplate
+# TypeScript Next Boilerplate
+
 TypeScript Next Boilerplate
