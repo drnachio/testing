@@ -5,7 +5,7 @@ metadata:
 spec:
   selector:
     app: next-${CICD_GIT_BRANCH}-deploy
-  type: ClusterIp
+  type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
