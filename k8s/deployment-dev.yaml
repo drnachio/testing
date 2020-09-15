@@ -129,13 +129,7 @@ metadata:
 spec:
   maxReplicas: 3
   minReplicas: 2
-  metrics:
-    - resource:
-        name: cpu
-        target:
-          averageUtilization: 90
-          type: Utilization
-      type: Resource
+  targetCPUUtilizationPercentage: 80
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
