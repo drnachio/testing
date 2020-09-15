@@ -1,18 +1,27 @@
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${CICD_GIT_REPO_NAME}-dev
+  labels:
+    app.kubernetes.io/name: dev
+    app.kubernetes.io/instance: dev
+---
 # Service - next-service
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    run: next-${ENVIRONMENT}
-  name: next-service-${ENVIRONMENT}
-  namespace: ${CICD_GIT_REPO_NAME}-${ENVIRONMENT}
+    run: next-dev
+  name: next-service-dev
+  namespace: ${CICD_GIT_REPO_NAME}-dev
 spec:
   ports:
   - port: 80
     protocol: TCP
     targetPort: 80
   selector:
-    run: next-${ENVIRONMENT}
+    run: next-dev
   sessionAffinity: None
   type: ClusterIP
 ---
@@ -20,8 +29,8 @@ spec:
 apiVersion: cert-manager.io/v1alpha2
 kind: Issuer
 metadata:
-  name: letsencrypt-${ENVIRONMENT}
-  namespace: ${CICD_GIT_REPO_NAME}-${ENVIRONMENT}
+  name: letsencrypt-dev
+  namespace: ${CICD_GIT_REPO_NAME}-dev
 spec:
   acme:
     # The ACME server URL
@@ -30,14 +39,14 @@ spec:
     email: soporte@binpar.com
     # Name of a secret used to store the ACME account private key
     privateKeySecretRef:
-      name: letsencrypt-${ENVIRONMENT}
+      name: letsencrypt-dev
     # Enable the HTTP-01 challenge provider
     solvers:
     - http01:
         ingress:
           class: nginx
 ---
-# Ingress - ingress-${ENVIRONMENT}
+# Ingress - ingress-dev
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -45,49 +54,49 @@ metadata:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-passthrough: "false"
-    cert-manager.io/issuer: "letsencrypt-${ENVIRONMENT}"
+    cert-manager.io/issuer: "letsencrypt-dev"
   generation: 2
-  name: ingress-${ENVIRONMENT}
-  namespace: ${CICD_GIT_REPO_NAME}-${ENVIRONMENT}
+  name: ingress-dev
+  namespace: ${CICD_GIT_REPO_NAME}-dev
 spec:
   rules:
-  - host: ${CICD_GIT_REPO_NAME}-${ENVIRONMENT}.binpar.cloud
+  - host: ${CICD_GIT_REPO_NAME}-dev.binpar.cloud
     http:
       paths:
       - backend:
-          serviceName: next-service-${ENVIRONMENT}
+          serviceName: next-service-dev
           servicePort: 80
         path: /
   tls:
   - hosts:
-    - ${CICD_GIT_REPO_NAME}-${ENVIRONMENT}.binpar.cloud
-    secretName: ${CICD_GIT_REPO_NAME}-cert-${ENVIRONMENT}
+    - ${CICD_GIT_REPO_NAME}-dev.binpar.cloud
+    secretName: ${CICD_GIT_REPO_NAME}-cert-dev
 ---
 # Deploy - next-deploy
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    run: next-${ENVIRONMENT}
-  name: next-deploy-${ENVIRONMENT}
-  namespace: ${CICD_GIT_REPO_NAME}-${ENVIRONMENT}
+    run: next-dev
+  name: next-deploy-dev
+  namespace: ${CICD_GIT_REPO_NAME}-dev
 spec:
   replicas: 2
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      run: next-${ENVIRONMENT}
+      run: next-dev
   template:
     metadata:
       labels:
-        run: next-${ENVIRONMENT}
+        run: next-dev
     spec:
       containers:
       - image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
-        name: next-${ENVIRONMENT}
+        name: next-dev
         envFrom:
         - configMapRef:
-            name: next-config-${ENVIRONMENT}
+            name: next-config-dev
         ports:
         - containerPort: 80
         readinessProbe:
@@ -107,17 +116,17 @@ spec:
             memory: "1024Mi"
             cpu: "950m"
 ---
-# HPA - api-hpa-${ENVIRONMENT}
+# HPA - api-hpa-dev
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: next-hpa-${ENVIRONMENT}
-  namespace: ${CICD_GIT_REPO_NAME}-${ENVIRONMENT}
+  name: next-hpa-dev
+  namespace: ${CICD_GIT_REPO_NAME}-dev
 spec:
   maxReplicas: 4
   minReplicas: 2
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
-    name: next-deploy-${ENVIRONMENT}
+    name: next-deploy-dev
   targetCPUUtilizationPercentage: 80

@@ -6,6 +6,8 @@
     "camelcase",
     "esnext",
     "healthcheck",
+    "kubernetes",
+    "letsencrypt",
     "plusplus"
   ]
 }

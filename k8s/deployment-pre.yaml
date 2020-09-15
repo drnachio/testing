@@ -1,0 +1,132 @@
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${CICD_GIT_REPO_NAME}-pre
+  labels:
+    app.kubernetes.io/name: pre
+    app.kubernetes.io/instance: pre
+---
+# Service - next-service
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: next-pre
+  name: next-service-pre
+  namespace: ${CICD_GIT_REPO_NAME}-pre
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    run: next-pre
+  sessionAffinity: None
+  type: ClusterIP
+---
+# Issuer - letsencrypt
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+  name: letsencrypt-pre
+  namespace: ${CICD_GIT_REPO_NAME}-pre
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: soporte@binpar.com
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-pre
+    # Enable the HTTP-01 challenge provider
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+---
+# Ingress - ingress-pre
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-passthrough: "false"
+    cert-manager.io/issuer: "letsencrypt-pre"
+  generation: 2
+  name: ingress-pre
+  namespace: ${CICD_GIT_REPO_NAME}-pre
+spec:
+  rules:
+  - host: ${CICD_GIT_REPO_NAME}-pre.binpar.cloud
+    http:
+      paths:
+      - backend:
+          serviceName: next-service-pre
+          servicePort: 80
+        path: /
+  tls:
+  - hosts:
+    - ${CICD_GIT_REPO_NAME}-pre.binpar.cloud
+    secretName: ${CICD_GIT_REPO_NAME}-cert-pre
+---
+# Deploy - next-deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: next-pre
+  name: next-deploy-pre
+  namespace: ${CICD_GIT_REPO_NAME}-pre
+spec:
+  replicas: 2
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      run: next-pre
+  template:
+    metadata:
+      labels:
+        run: next-pre
+    spec:
+      containers:
+      - image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
+        name: next-pre
+        envFrom:
+        - configMapRef:
+            name: next-config-pre
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /healthcheck
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 120
+          failureThreshold: 2
+          timeoutSeconds: 5
+          periodSeconds: 60
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "50m"
+          limits:
+            memory: "1024Mi"
+            cpu: "950m"
+---
+# HPA - api-hpa-pre
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: next-hpa-pre
+  namespace: ${CICD_GIT_REPO_NAME}-pre
+spec:
+  maxReplicas: 4
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: next-deploy-pre
+  targetCPUUtilizationPercentage: 80
