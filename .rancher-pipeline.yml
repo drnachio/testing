@@ -8,15 +8,7 @@ stages:
   - name: Deploy
     steps:
       - applyYamlConfig:
-          path: ./configMaps/global.yaml
-      - applyYamlConfig:
           path: ./k8s/deployment-dev.yaml
-        when:
-          branch:
-            include:
-              - develop
-      - applyYamlConfig:
-          path: ./configMaps/config-dev.yaml
         when:
           branch:
             include:
@@ -28,24 +20,34 @@ stages:
             include:
               - release/*
       - applyYamlConfig:
+          path: ./k8s/deployment-prod.yaml
+        when:
+          branch:
+            include:
+              - master
+  - name: Setup
+    steps:
+      - applyYamlConfig:
+          path: ./configMaps/global.yaml
+      - applyYamlConfig:
+          path: ./configMaps/config-dev.yaml
+        when:
+          branch:
+            include:
+              - develop
+      - applyYamlConfig:
           path: ./configMaps/config-pre.yaml
         when:
           branch:
             include:
               - release/*
       - applyYamlConfig:
-          path: ./k8s/deployment-prod.yaml
-        when:
-          branch:
-            include:
-              - master
-      - applyYamlConfig:
           path: ./configMaps/config-prod.yaml
         when:
           branch:
             include:
               - master
-timeout: 10
+timeout: 20
 branch:
   include:
     - master
