@@ -14,7 +14,7 @@ stages:
     when:
       branch:
         include:
-        - master
+          - master
   - applyYamlConfig:
       path: ./deployment.yaml
     env:
@@ -22,7 +22,7 @@ stages:
     when:
       branch:
         include:
-        - develop
+          - develop
   - applyYamlConfig:
       path: ./deployment.yaml
     env:
@@ -30,11 +30,11 @@ stages:
     when:
       branch:
         include:
-        - release/*
+          - release/*
 timeout: 60
 branch:
   include:
-  - master
-  - develop
-  - release/*
+    - master
+    - develop
+    - release/*
 notification: {}
