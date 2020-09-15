@@ -1,0 +1,43 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: next-${CICD_GIT_BRANCH}-service
+spec:
+  selector:
+    app: next-${CICD_GIT_BRANCH}-deploy
+  type: ClusterIp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: next-${CICD_GIT_BRANCH}-deploy
+  labels:
+    app: next-${CICD_GIT_BRANCH}-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: next-${CICD_GIT_BRANCH}-deploy
+  template:
+    metadata:
+      labels:
+        app: next-${CICD_GIT_BRANCH}-deploy
+    spec:
+      imagePullSecrets:
+        - name: pipeline-docker-registry
+      containers:
+        - name: next-${CICD_GIT_BRANCH}-container
+          image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthcheck
+              port: 80
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 10
