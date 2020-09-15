@@ -127,8 +127,14 @@ metadata:
 spec:
   maxReplicas: 4
   minReplicas: 2
+  metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 70
+          type: Utilization
+      type: Resource
   scaleTargetRef:
-    apiVersion: extensions/v1beta1
+    apiVersion: apps/v1
     kind: Deployment
     name: next-deploy-prod
-  targetCPUUtilizationPercentage: 80

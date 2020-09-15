@@ -125,10 +125,16 @@ metadata:
   name: next-hpa-dev
   namespace: ${CICD_GIT_REPO_NAME}-dev
 spec:
-  maxReplicas: 4
+  maxReplicas: 3
   minReplicas: 2
+  metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 90
+          type: Utilization
+      type: Resource
   scaleTargetRef:
-    apiVersion: extensions/v1beta1
+    apiVersion: apps/v1
     kind: Deployment
     name: next-deploy-dev
-  targetCPUUtilizationPercentage: 80
