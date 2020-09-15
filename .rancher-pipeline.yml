@@ -30,12 +30,12 @@ stages:
       when:
         branch:
           include:
-          - release/*
+          - 'release/*'
   timeout: 60
   branch:
     include:
     - master
     - develop
-    - release/*
+    - 'release/*'
   notification: {}
   
