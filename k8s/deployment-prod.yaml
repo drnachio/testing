@@ -14,7 +14,6 @@ metadata:
   labels:
     run: next-prod
   name: next-service-prod
-  namespace: ${CICD_GIT_REPO_NAME}-prod
 spec:
   ports:
   - port: 80
@@ -30,7 +29,6 @@ apiVersion: cert-manager.io/v1alpha2
 kind: Issuer
 metadata:
   name: letsencrypt-prod
-  namespace: ${CICD_GIT_REPO_NAME}-prod
 spec:
   acme:
     # The ACME server URL
@@ -57,7 +55,6 @@ metadata:
     cert-manager.io/issuer: "letsencrypt-prod"
   generation: 2
   name: ingress-prod
-  namespace: ${CICD_GIT_REPO_NAME}-prod
 spec:
   rules:
   - host: ${CICD_GIT_REPO_NAME}.binpar.cloud
@@ -79,7 +76,6 @@ metadata:
   labels:
     run: next-prod
   name: next-deploy-prod
-  namespace: ${CICD_GIT_REPO_NAME}-prod
 spec:
   replicas: 2
   revisionHistoryLimit: 2
@@ -121,7 +117,6 @@ apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: next-hpa-prod
-  namespace: ${CICD_GIT_REPO_NAME}-prod
 spec:
   maxReplicas: 4
   minReplicas: 2
