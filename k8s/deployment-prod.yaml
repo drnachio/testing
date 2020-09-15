@@ -2,26 +2,26 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: ${CICD_GIT_REPO_NAME}-${ENVIRONMENT}
+  name: ${CICD_GIT_REPO_NAME}-prod
   labels:
-    app.kubernetes.io/name: ${ENVIRONMENT}
-    app.kubernetes.io/instance: ${ENVIRONMENT}
+    app.kubernetes.io/name: prod
+    app.kubernetes.io/instance: prod
 ---
 # Service - next-service
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    run: next-${ENVIRONMENT}
-  name: next-service-${ENVIRONMENT}
-  namespace: ${CICD_GIT_REPO_NAME}-${ENVIRONMENT}
+    run: next-prod
+  name: next-service-prod
+  namespace: ${CICD_GIT_REPO_NAME}-prod
 spec:
   ports:
-    - port: 80
-      protocol: TCP
-      targetPort: 80
+  - port: 80
+    protocol: TCP
+    targetPort: 80
   selector:
-    run: next-${ENVIRONMENT}
+    run: next-prod
   sessionAffinity: None
   type: ClusterIP
 ---
@@ -29,8 +29,8 @@ spec:
 apiVersion: cert-manager.io/v1alpha2
 kind: Issuer
 metadata:
-  name: letsencrypt-${ENVIRONMENT}
-  namespace: ${CICD_GIT_REPO_NAME}-${ENVIRONMENT}
+  name: letsencrypt-prod
+  namespace: ${CICD_GIT_REPO_NAME}-prod
 spec:
   acme:
     # The ACME server URL
@@ -39,96 +39,96 @@ spec:
     email: soporte@binpar.com
     # Name of a secret used to store the ACME account private key
     privateKeySecretRef:
-      name: letsencrypt-${ENVIRONMENT}
+      name: letsencrypt-prod
     # Enable the HTTP-01 challenge provider
     solvers:
-      - http01:
-          ingress:
-            class: nginx
+    - http01:
+        ingress:
+          class: nginx
 ---
-# Ingress - ingress-${ENVIRONMENT}
+# Ingress - ingress-prod
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-passthrough: 'false'
-    cert-manager.io/issuer: 'letsencrypt-${ENVIRONMENT}'
+    nginx.ingress.kubernetes.io/ssl-passthrough: "false"
+    cert-manager.io/issuer: "letsencrypt-prod"
   generation: 2
-  name: ingress-${ENVIRONMENT}
-  namespace: ${CICD_GIT_REPO_NAME}-${ENVIRONMENT}
+  name: ingress-prod
+  namespace: ${CICD_GIT_REPO_NAME}-prod
 spec:
   rules:
-    - host: ${CICD_GIT_REPO_NAME}-${ENVIRONMENT}.binpar.cloud
-      http:
-        paths:
-          - backend:
-              serviceName: next-service-${ENVIRONMENT}
-              servicePort: 80
-            path: /
+  - host: ${CICD_GIT_REPO_NAME}.binpar.cloud
+    http:
+      paths:
+      - backend:
+          serviceName: next-service-prod
+          servicePort: 80
+        path: /
   tls:
-    - hosts:
-        - ${CICD_GIT_REPO_NAME}-${ENVIRONMENT}.binpar.cloud
-      secretName: ${CICD_GIT_REPO_NAME}-cert-${ENVIRONMENT}
+  - hosts:
+    - ${CICD_GIT_REPO_NAME}.binpar.cloud
+    secretName: ${CICD_GIT_REPO_NAME}-cert-prod
 ---
 # Deploy - next-deploy
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    run: next-${ENVIRONMENT}
-  name: next-deploy-${ENVIRONMENT}
-  namespace: ${CICD_GIT_REPO_NAME}-${ENVIRONMENT}
+    run: next-prod
+  name: next-deploy-prod
+  namespace: ${CICD_GIT_REPO_NAME}-prod
 spec:
   replicas: 2
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      run: next-${ENVIRONMENT}
+      run: next-prod
   template:
     metadata:
       labels:
-        run: next-${ENVIRONMENT}
+        run: next-prod
     spec:
       imagePullSecrets:
         - name: pipeline-docker-registry
       containers:
-        - image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
-          name: next-${ENVIRONMENT}
-          envFrom:
-            - configMapRef:
-                name: next-config-${ENVIRONMENT}
-          ports:
-            - containerPort: 80
-          readinessProbe:
-            httpGet:
-              path: /healthcheck
-              port: 80
-              scheme: HTTP
-            initialDelaySeconds: 120
-            failureThreshold: 2
-            timeoutSeconds: 5
-            periodSeconds: 60
-          resources:
-            requests:
-              memory: '256Mi'
-              cpu: '50m'
-            limits:
-              memory: '1024Mi'
-              cpu: '950m'
+      - image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
+        name: next-prod
+        envFrom:
+        - configMapRef:
+            name: next-config-prod
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /healthcheck
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 120
+          failureThreshold: 2
+          timeoutSeconds: 5
+          periodSeconds: 60
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "50m"
+          limits:
+            memory: "1024Mi"
+            cpu: "950m"
 ---
-# HPA - api-hpa-${ENVIRONMENT}
+# HPA - api-hpa-prod
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: next-hpa-${ENVIRONMENT}
-  namespace: ${CICD_GIT_REPO_NAME}-${ENVIRONMENT}
+  name: next-hpa-prod
+  namespace: ${CICD_GIT_REPO_NAME}-prod
 spec:
   maxReplicas: 4
   minReplicas: 2
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
-    name: next-deploy-${ENVIRONMENT}
+    name: next-deploy-prod
   targetCPUUtilizationPercentage: 80

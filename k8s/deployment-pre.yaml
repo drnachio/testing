@@ -91,6 +91,8 @@ spec:
       labels:
         run: next-pre
     spec:
+      imagePullSecrets:
+        - name: pipeline-docker-registry
       containers:
         - image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
           name: next-pre
