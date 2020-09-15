@@ -1,17 +1,41 @@
 stages:
-- name: Compile And Test
-  steps:
-  - publishImageConfig:
-      dockerfilePath: ./Dockerfile
-      buildContext: .
-      tag: ${CICD_GIT_REPO_NAME}/next:${CICD_EXECUTION_SEQUENCE}
-- name: Deploy
-  steps:
-  - applyYamlConfig:
-      path: ./deployment.yaml
-timeout: 60
-branch:
-  include:
-  - master
-  - develop
-notification: {}
+  - name: Compile And Test
+    steps:
+    - publishImageConfig:
+        dockerfilePath: ./Dockerfile
+        buildContext: .
+        tag: ${CICD_GIT_REPO_NAME}/next:${CICD_EXECUTION_SEQUENCE}
+  - name: Deploy
+    steps:
+    - applyYamlConfig:
+        path: ./deployment.yaml
+      env:
+        ENVIRONMENT: prod
+      when:
+        branch:
+          include:
+          - master
+    - applyYamlConfig:
+        path: ./deployment.yaml
+      env:
+        ENVIRONMENT: dev
+      when:
+        branch:
+          include:
+          - develop
+    - applyYamlConfig:
+        path: ./deployment.yaml
+      env:
+        ENVIRONMENT: pre
+      when:
+        branch:
+          include:
+          - release/*
+  timeout: 60
+  branch:
+    include:
+    - master
+    - develop
+    - release/*
+  notification: {}
+  
