@@ -98,8 +98,6 @@ spec:
           name: next-prod
           envFrom:
             - configMapRef:
-                name: ${CICD_GIT_REPO_NAME}-config
-            - configMapRef:
                 name: next-config-prod
           ports:
             - containerPort: 80

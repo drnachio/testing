@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: ${CICD_GIT_REPO_NAME}-config
-  namespace: default
-data:
-  appName: '${CICD_GIT_REPO_NAME}'
-  test: 'false'
