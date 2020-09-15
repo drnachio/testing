@@ -28,8 +28,6 @@ stages:
   - name: Setup
     steps:
       - applyYamlConfig:
-          path: ./configMaps/global.yaml
-      - applyYamlConfig:
           path: ./configMaps/config-dev.yaml
         when:
           branch:
