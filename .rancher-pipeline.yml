@@ -1,30 +1,30 @@
 stages:
-- name: Compile And Test
-  steps:
-  - publishImageConfig:
-      dockerfilePath: ./Dockerfile
-      buildContext: .
-      tag: ${CICD_GIT_REPO_NAME}/next:${CICD_EXECUTION_SEQUENCE}
-- name: Deploy
-  steps:
-  - applyYamlConfig:
-      path: ./k8s/deployment-dev.yaml
-    when:
-      branch:
-        include:
-          - develop
-  - applyYamlConfig:
-      path: ./k8s/deployment-pre.yaml
-    when:
-      branch:
-        include:
-          - release/*
-  - applyYamlConfig:
-      path: ./k8s/deployment-prod.yaml
-    when:
-      branch:
-        include:
-          - master
+  - name: Compile And Test
+    steps:
+      - publishImageConfig:
+          dockerfilePath: ./Dockerfile
+          buildContext: .
+          tag: ${CICD_GIT_REPO_NAME}/next:${CICD_EXECUTION_SEQUENCE}
+  - name: Deploy
+    steps:
+      - applyYamlConfig:
+          path: ./k8s/deployment-dev.yaml
+        when:
+          branch:
+            include:
+              - develop
+      - applyYamlConfig:
+          path: ./k8s/deployment-pre.yaml
+        when:
+          branch:
+            include:
+              - release/*
+      - applyYamlConfig:
+          path: ./k8s/deployment-prod.yaml
+        when:
+          branch:
+            include:
+              - master
 timeout: 60
 branch:
   include:
