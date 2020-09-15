@@ -6,8 +6,8 @@ metadata:
   labels:
     app.kubernetes.io/name: dev
     app.kubernetes.io/instance: dev
-  annotations:
-    field.cattle.io/projectId: c-gh7zk:p-7qkkh
+annotations:
+  field.cattle.io/projectId: c-gh7zk:p-7qkkh
 ---
 # Service - next-service
 apiVersion: v1
