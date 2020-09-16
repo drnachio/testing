@@ -3,7 +3,7 @@ FROM node:12-alpine AS base
 WORKDIR /usr/src/app
 COPY package*.json ./
 
-# -- Biold Base ---
+# -- Build Base ---
 FROM base AS build-base
 COPY ["./jest.config.js", "./jest.setup.js", "./tsconfig.json", "./next-env.d.ts", "./.eslintrc", "./.eslintignore", "./"]
 
@@ -25,6 +25,7 @@ RUN npm run test
 # ---- Compile  ----
 FROM build-base AS compile
 COPY ./pages ./pages
+COPY ./src ./src
 COPY --from=dependencies /usr/src/app/node_modules ./node_modules
 RUN npm run build
 
