@@ -1,4 +1,20 @@
 stages:
+  - name: Prerequisites
+    steps:
+      - runScriptConfig:
+          image: badouralix/rancher-cli
+          shellScript: rancher projects
+        envFrom:
+          - sourceName: rancher-cli-access
+            sourceKey: RANCHER_ACCESS_KEY
+          - sourceName: rancher-cli-access
+            sourceKey: RANCHER_SECRET_KEY
+          - sourceName: rancher-cli-access
+            sourceKey: RANCHER_URL
+    when:
+      branch:
+        include:
+          - test
   - name: Compile And Test
     steps:
       - publishImageConfig:
@@ -9,22 +25,6 @@ stages:
       branch:
         exclude:
           - test
-  - name: Prerequisites
-    steps:
-    - runScriptConfig:
-        image: badouralix/rancher-cli
-        shellScript: rancher projects
-      envFrom:
-      - sourceName: rancher-cli-access
-        sourceKey: RANCHER_ACCESS_KEY
-      - sourceName: rancher-cli-access
-        sourceKey: RANCHER_SECRET_KEY
-      - sourceName: rancher-cli-access
-        sourceKey: RANCHER_URL
-    when:
-      branch:
-        include:
-        - test
   - name: Configuration
     steps:
       - applyYamlConfig:
