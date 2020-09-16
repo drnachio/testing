@@ -5,6 +5,26 @@ stages:
           dockerfilePath: ./Dockerfile
           buildContext: .
           tag: ${CICD_GIT_REPO_NAME}/next:${CICD_EXECUTION_SEQUENCE}
+  - name: Configuration
+    steps:
+      - applyYamlConfig:
+          path: ./configMaps/config-dev.yaml
+        when:
+          branch:
+            include:
+              - develop
+      - applyYamlConfig:
+          path: ./configMaps/config-pre.yaml
+        when:
+          branch:
+            include:
+              - release/*
+      - applyYamlConfig:
+          path: ./configMaps/config-prod.yaml
+        when:
+          branch:
+            include:
+              - master
   - name: Deploy
     steps:
       - applyYamlConfig:
@@ -21,26 +41,6 @@ stages:
               - release/*
       - applyYamlConfig:
           path: ./k8s/deployment-prod.yaml
-        when:
-          branch:
-            include:
-              - master
-  - name: Setup
-    steps:
-      - applyYamlConfig:
-          path: ./configMaps/config-dev.yaml
-        when:
-          branch:
-            include:
-              - develop
-      - applyYamlConfig:
-          path: ./configMaps/config-pre.yaml
-        when:
-          branch:
-            include:
-              - release/*
-      - applyYamlConfig:
-          path: ./configMaps/config-prod.yaml
         when:
           branch:
             include:
