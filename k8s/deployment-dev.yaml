@@ -106,7 +106,7 @@ spec:
               path: /healthcheck
               port: 80
               scheme: HTTP
-            initialDelaySeconds: 120
+            initialDelaySeconds: 10
             failureThreshold: 2
             timeoutSeconds: 5
             periodSeconds: 60
