@@ -10,7 +10,9 @@
     "test": "jest",
     "test-coverage": "jest --coverage",
     "test-coverage-dev": "NODE_ENV=development jest --coverage --watchAll",
-    "test-dev": "NODE_ENV=development npx jest --watch"
+    "test-dev": "NODE_ENV=development npx jest --watch",
+    "docker-build": "docker build -t boilerplate .",
+    "docker-run ": "docker run -p 8080:80 -e PROJECT_NAME=BinPar boilerplate"
   },
   "repository": {
     "type": "git",

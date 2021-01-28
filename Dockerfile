@@ -16,6 +16,7 @@ RUN npm install
 
 # ---- Test ----
 FROM dependencies AS test
+RUN rm -rf prod_node_modules
 COPY ./pages ./pages
 COPY ./src ./src
 COPY ./tests ./tests
