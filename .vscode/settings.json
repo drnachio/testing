@@ -9,6 +9,8 @@
     "healthcheck",
     "kubernetes",
     "letsencrypt",
-    "plusplus"
+    "plusplus",
+    "testname",
+    "typeahead"
   ]
 }

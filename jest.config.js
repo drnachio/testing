@@ -1,12 +1,17 @@
-const testRegex = '(/tests/.*|(\\.|/)(test|spec))\\.(jsx?|js?|tsx?|ts?)$'
-
 module.exports = {
-  setupFiles: ['<rootDir>/jest.setup.js'],
-  testRegex: testRegex,
+  roots: ['<rootDir>'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'json', 'jsx'],
+  testPathIgnorePatterns: ['<rootDir>[/\\\\](node_modules|.next)[/\\\\]'],
+  transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.(ts|tsx)$'],
   transform: {
-    '^.+\\.jsx?$': require.resolve('babel-jest'),
-    '^.+\\.tsx?$': 'ts-jest'
+    '^.+\\.(ts|tsx)$': 'babel-jest',
   },
-  testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/prod_node_modules/'],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-};
+  watchPlugins: [
+    'jest-watch-typeahead/filename',
+    'jest-watch-typeahead/testname',
+  ],
+  moduleNameMapper: {
+    '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
+    '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/test/__mocks__/fileMock.js',
+  },
+}
