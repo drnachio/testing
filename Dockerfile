@@ -5,7 +5,7 @@ COPY package*.json ./
 
 # -- Build Base ---
 FROM base AS build-base
-COPY ["./jest.config.js", "./jest.setup.js", "./tsconfig.json", "./next-env.d.ts", "./.eslintrc", "./.eslintignore", "./"]
+COPY ["./jest.config.js", ".babelrc", "./tsconfig.json", "./next-env.d.ts", "./.eslintrc", "./.eslintignore", "./"]
 
 # -- Dependencies Node ---
 FROM build-base AS dependencies
