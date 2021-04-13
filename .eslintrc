@@ -41,6 +41,7 @@
     "jsx-a11y/anchor-is-valid": "off",
     "import/extensions": "off",
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx", ".tsx"] }],
+    "react/prop-types": "off",
     "@typescript-eslint/no-unused-vars": "error",
     "@typescript-eslint/adjacent-overload-signatures": "error",
     "@typescript-eslint/array-type": "error",
