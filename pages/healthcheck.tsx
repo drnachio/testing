@@ -8,4 +8,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-export default (): JSX.Element => null;
+export default (): React.ReactNode => null;
