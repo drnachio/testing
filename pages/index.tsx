@@ -24,7 +24,7 @@ const index: React.FC<IndexProps> = ({title}) => (
 export const getServerSideProps: GetServerSideProps<IndexProps>  = async () => {
   return {
     props: {
-      title: `Hello ${process.env.PROJECT_NAME}!`,
+      title: `Hello New ${process.env.PROJECT_NAME}!`,
     },
   }
 }
